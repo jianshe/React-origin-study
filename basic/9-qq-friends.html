@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>组件复用</title>
+    <style type="text/css">
+      .panel {
+        border: 1px solid #000;
+        width: 60%;
+      }
+      .title {
+        margin: 0;
+        padding: 10px;
+        background: #ccc;
+      }
+      p.message {
+        color: #aaa;
+      }
+      p.vip {
+        color: #ff0000;
+      }
+      .listWrap {
+        height: 0;
+        overflow: hidden;
+        transition: 0.5s;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="../js/react.development.js"></script>
+    <script src="../js/react-dom.development.js"></script>
+    <script src="../js/babel.min.js"></script>
+    <script src="../js/data.js"></script>
+    <script type="text/babel">
+      /**
+       *  点击切换需要用到React state属性
+       *   组件通信:
+       *    注意：React中没法向两个同级组件之间传递消息。
+       *      1.父子组件之间通信
+       * **/
+      class Panel extends React.Component {
+        constructor() {
+          super(...arguments);
+        }
+          this.state = {
+            showList: [true, false, false]
+          };
+          this.changeList = this.changeList.bind(this);
+        }
+        changeList(i) {
+          // 需要让当前第几个显示
+          const showList = this.state.showList.map((item, index) => {
+            if (i === index) {
+              return true;
+            }
+            return false;
+          });
+          // console.log(showList);
+          this.setState({
+            showList
+          });
+        }
+        setShow() {
+          const groupList = Object.keys(this.props.data).map((key, index) => {
+            return (
+              <Group
+                key={index}
+                data={this.props.data[key]}
+                show={this.state.showList[index]}
+                changeList={this.changeList}
+                index={index}
+              />
+            );
+          });
+          return groupList;
+        }
+        render() {
+          return (
+            <div className="panel">
+              {/* Object.keys(this.props.data).map((key, index) => {
+                return <Group key={index} data={this.props.data[key]} />;
+              }) */}
+              {this.setShow()}
+            </div>
+          );
+        }
+      }
+      class Group extends React.Component {
+        constructor() {
+          super(...arguments);
+          this.state = {
+            show: this.props.show
+          };
+        }
+        // 组件的生命周期，当组件更新时会被调用。nextState一直等到完成更新之后才会改变
+        shouldComponentUpdate(nextProps, nextState) {
+          // console.log(nextProps, nextState)
+          if (this.state.show !== nextProps.show) {
+            this.setState({
+              show: nextProps.show
+            });
+          }
+          if (this.state.show !== nextState.show) {
+            this.showList(nextState.show);
+          }
+          // this.showList(); //此时会出现收缩无法正常收缩的问题
+          return false;
+          // return true;
+        }
+        // 组件生命周期之挂载完成(组件已经被渲染到dom中)
+        componentDidMount() {
+          // console.log('组件已经被渲染到dom中')
+          this.showList(this.state.show);
+        }
+        showList(show) {
+          const list = this.refs.list;
+          if (show ) {
+            list.style.height = list.scrollHeight + 'px';
+          } else {
+            list.style.height = 0;
+          }
+        }
+        changeList() {
+          // console.log(this); // 注意如果直接调用this.changeList时，
+          // this并不指向Group组件，此处打印出来的this为undefined.
+          // 因此需要通过bind方法重新绑定this，以保证this指向Group对象。
+          // 通过this.setState方法，修改构造函数中的this.state对象的属性，注意方法需要传递一个对象。
+          let show = !this.state.show;
+          this.setState({
+            show: show
+          });
+          if (show) {
+            //  console.log('操作其它列表隐藏');
+            this.props.changeList(this.props.index);
+          }
+          /**
+           *  子集改变状态有两种状态：
+           *  1.隐藏当前，不需要改变其它列表状态。
+           *  2.展开当前，隐藏其它项的状态。
+           *
+           * **/
+        }
+
+        render() {
+          // console.log(this.state.show)
+          return (
+            <div>
+              <h2 className="title" onClick={this.changeList.bind(this)}>
+                {this.props.data.name}
+              </h2>
+              {/* this.state.show ? <List data={this.props.data.list} /> : '' */}
+              <div className="listWrap" ref="list">
+                <List data={this.props.data.list} />
+              </div>
+            </div>
+          );
+        }
+      }
+      class List extends React.Component {
+        render() {
+          return (
+            <ul>
+              {this.props.data.map((item, index) => {
+                return (
+                  <li key={index}>
+                    <p className={item.vip ? 'vip' : ''}>{item.username}</p>
+                    <p className="message">{item.message}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        }
+      }
+      ReactDOM.render(
+        <Panel data={dataList}></Panel>,
+        document.getElementById('app')
+      );
+    </script>
+  </body>
+</html>

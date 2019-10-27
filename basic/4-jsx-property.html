@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="../js/react.development.js"></script>
+    <script src="../js/react-dom.development.js"></script>
+    <script src="../js/babel.min.js"></script>
+    <script type="text/babel">
+      /**
+       *   JSX 属性
+       *    1.jsx标签也是支持属性设置的
+       *    2.基本使用和html或者xml类型，在标签上添加属性名=属性值，注意：属性值必须使用双引号包含。
+       *    3.值是可以接受插值表达式的。(需要去除引号)
+       * 
+       *    注意：1.class使用className属性来代替。
+       *          2.style值必须是对象。
+       * **/
+      let a = 'testA'
+      ReactDOM.render(
+        <div>
+          <h1 id="a">Hello React!</h1>
+          <h1 id={a}>Hello React!</h1>
+          <h1 className="box">Hello React!</h1>
+          <h1 style={{color:"#ff7400"}}>Hello React!</h1>
+        </div>,
+        document.getElementById('app')
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="../js/react.development.js"></script>
+    <script src="../js/react-dom.development.js"></script>
+    <script src="../js/babel.min.js"></script>
+    <script type="text/babel">
+      /**
+       *    1.react中没有模版语法，插值表达式中只支持表达式，不支持语句。(for,if)
+       *    2.表达式是支持函数调用的。
+       *    3.对象想输入的话，可以使用Object.keys()方法返回一个数组，这个数组包含所有返回的key属性
+       * **/
+      const users = ['jerry', 'alex', 'albert'];
+      const obj = {
+        left: 100,
+        top: 200
+      }
+      ReactDOM.render(
+        <div>
+          <ul>
+            {/**1.根据数组中的内容生成一个包含有结构的新数组.
+                2.通过数组生成的结构，每一个元素必须包含一个key属性，同时这个key属性的值必须是唯一的。
+              **/
+            users.map((user, index) => {
+              return <li key={index}>{user}</li>;
+            })}
+          </ul>
+          <ul>
+            {
+              Object.keys(obj).map( key => {
+                return <li key={key}>{key}-{obj[key]}</li>
+              })
+            }  
+          </ul>
+        </div>,
+        document.getElementById('app')
+      );
+    </script>
+  </body>
+</html>
